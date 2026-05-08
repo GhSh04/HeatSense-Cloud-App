@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>HeatSense — Heat Safety Assistant</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+  </head>
+  <body>
+    <div class="page">
+      <div class="card">
+        <header class="card__header">
+          <div class="brand">
+            <span class="brand__icon" aria-hidden="true">☀</span>
+            <h1 class="brand__title">HeatSense</h1>
+          </div>
+          <p class="tagline">Cloud-based heat safety assistant</p>
+        </header>
+
+        <form class="form" method="post" action="{{ url_for('home') }}">
+          <div class="field">
+            <label class="field__label" for="temperature">Temperature (°C)</label>
+            <input
+              class="field__input"
+              type="text"
+              id="temperature"
+              name="temperature"
+              inputmode="decimal"
+              autocomplete="off"
+              placeholder="e.g. 36"
+              value="{{ temp_value }}"
+              required
+            />
+          </div>
+
+          <div class="field">
+            <label class="field__label" for="activity">Outdoor activity</label>
+            <select class="field__input field__select" id="activity" name="activity">
+              {% for act in activities %}
+              <option value="{{ act }}" {% if act == activity_value %}selected{% endif %}>{{ act }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <button class="btn" type="submit">Check Heat Risk</button>
+        </form>
+
+        {% if error %}
+        <div class="alert alert--error" role="alert">{{ error }}</div>
+        {% endif %}
+
+        {% if result %}
+        <section class="result" aria-live="polite">
+          <h2 class="result__title">Your heat risk</h2>
+          <p class="result__meta">
+            <span class="result__temp">{{ "%.1f"|format(result.celsius) }}°C</span>
+            <span class="result__activity">· {{ result.activity }}</span>
+          </p>
+          <div class="risk-badge risk-badge--{{ result.risk | lower | replace(' ', '-') }}">
+            {{ result.risk }}
+          </div>
+          <div class="result__advice">
+            <h3 class="result__subtitle">Safety advice</h3>
+            <p>{{ result.advice }}</p>
+          </div>
+        </section>
+        {% endif %}
+      </div>
+    </div>
+  </body>
+</html>
